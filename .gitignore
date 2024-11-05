@@ -3,4 +3,5 @@ credentials
 __pycache__/
 db.sqlite3
 .env
-cert*% 
+cert*%
+.DS_Store
