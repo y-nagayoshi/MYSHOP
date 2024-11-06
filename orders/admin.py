@@ -1,5 +1,22 @@
 from django.contrib import admin
 from .models import Order, OrderItem
+from django.utils.safestring import mark_safe
+from django.urls import reverse
+
+def order_payment(obj):
+    url = obj.get_stripe_url()
+    if obj.stripe_id:
+        html = f'<a href="{url}" target="_blank">{obj.stripe_id}</a>'
+        return mark_safe(html)
+    return ''
+
+order_payment.short_description = 'Stripe payment'
+
+def order_pdf(obj):
+    url = reverse('orders:admin_order_pdf', args=[obj.id])
+    return mark_safe(f'<a href="{url}">PDF</a>')
+
+order_pdf.short_description = 'Invoice'
 
 # Register your models here.
 class OrderItemInline(admin.TabularInline):
@@ -17,8 +34,10 @@ class OrderAdmin(admin.ModelAdmin):
         'postal_code',
         'city',
         'paid',
+        order_payment,
         'created',
         'updated',
+        order_pdf,
     ]
     list_filter = ['paid', 'created', 'updated']
     inlines = [OrderItemInline]
